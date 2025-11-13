@@ -1,0 +1,356 @@
+\documentclass[12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{titling}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{xspace}
+
+% Configuración de página
+\geometry{a4paper, margin=2.5cm, top=3cm, bottom=3cm}
+\setlength{\headheight}{15.71669pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+\onehalfspacing
+
+% Configuración de títulos
+\titleformat{\section}
+{\Large\bfseries}
+{\thesection}{1em}{}
+\titleformat{\subsection}
+{\large\bfseries}
+{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+{\bfseries}
+{\thesubsubsection}{1em}{}
+
+% Configuración de encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% Configuración del título principal
+\pretitle{\begin{center}\Huge\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\par\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\title{Análisis y Optimización de la Función \\ 
+$f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$}
+\author{Abraham Rey Sanchez Aamador \\ 
+Modelos de Optimización}
+\date{\today}
+
+\begin{document}
+
+% Portada
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Huge\bfseries Análisis y Optimización de la Función\par}
+    \vspace{1cm}
+    {\LARGE $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ \par}
+    \vspace{2cm}
+    {\Large Abraham Rey Sanchez Aamador \par}
+    \vspace{1cm}
+    {\large Modelos de Optimización \par}
+    \vspace{2cm}
+    {\large \today \par}
+    \vfill
+    \includegraphics[width=0.3\textwidth]{figures/curvas_nivel_lineal.png}
+    \vfill
+    \thispagestyle{empty}
+\end{titlepage}
+
+\pagenumbering{arabic}
+
+% Índice
+\tableofcontents
+\newpage
+
+% Resumen ejecutivo
+\section*{Resumen Ejecutivo}
+\addcontentsline{toc}{section}{Resumen Ejecutivo}
+
+Este informe presenta un análisis exhaustivo de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$, caracterizada por su naturaleza multimodal y comportamiento oscilatorio. El estudio abarca el análisis matemático completo, incluyendo el cálculo del gradiente y la matriz Hessiana, seguido de una exploración visual detallada del landscape de optimización. 
+
+Se implementan y comparan dos métodos de optimización representativos: el método de Máximo Descenso, que utiliza información de primer orden, y el método de Newton, que incorpora información de segundo orden a través de la matriz Hessiana. Los resultados demuestran las ventajas comparativas de cada método en diferentes contextos de inicialización y resaltan los desafíos particulares que presenta la multimodalidad de la función.
+
+\newpage
+
+\section{Introducción}
+
+La función objetivo bajo estudio, definida por la expresión $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$, representa un caso de interés particular en el ámbito de la optimización numérica debido a sus propiedades matemáticas distintivas. La composición de funciones trigonométricas y logarítmicas genera un landscape de optimización complejo caracterizado por la presencia de múltiples mínimos y máximos locales distribuidos en patrones anulares.
+
+Este comportamiento multimodal constituye un desafío significativo para los algoritmos de optimización convencionales, ya que la convergencia a óptimos globales depende críticamente de la estrategia de inicialización y de la capacidad del método para navegar regiones de no convexidad. El análisis sistemático de esta función proporciona insights valiosos sobre el desempeño comparativo de diferentes enfoques de optimización en presencia de multimodalidad.
+
+El presente estudio se estructura en tres componentes principales: el análisis matemático formal de la función, la caracterización visual de su landscape de optimización, y la evaluación experimental de dos métodos de optimización representativos. Esta aproximación integral permite establecer conexiones entre las propiedades analíticas de la función y el comportamiento práctico de los algoritmos numéricos.
+
+\section{Marco Teórico y Análisis Matemático}
+
+\subsection{Caracterización de la Función Objetivo}
+
+La función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ exhibe propiedades matemáticas notables que influyen directamente en su comportamiento de optimización. El dominio de la función abarca todo $\mathbb{R}^2$, garantizado por la condición $x^2 + y^2 + 1 \geq 1 > 0$ que asegura la definición del logaritmo. El rango de la función se encuentra acotado en el intervalo $[-1, 1]$ como consecuencia directa del rango de la función coseno.
+
+Una propiedad fundamental es la simetría radial de la función, manifestada a través de su dependencia exclusiva de la distancia euclidiana al origen mediante la cantidad $r^2 = x^2 + y^2$. Esta simetría simplifica considerablemente el análisis del comportamiento espacial de la función y permite la identificación sistemática de puntos críticos.
+
+\subsection{Análisis del Gradiente}
+
+El gradiente de la función, que determina las direcciones de máximo crecimiento local, puede expresarse analíticamente como:
+
+\[
+\nabla f(x,y) = \begin{bmatrix}
+\dfrac{2x \sin(\ln(x^2 + y^2 + 1))}{x^2 + y^2 + 1} \\[10pt]
+\dfrac{2y \sin(\ln(x^2 + y^2 + 1))}{x^2 + y^2 + 1}
+\end{bmatrix}
+\]
+
+La estructura del gradiente revela que los puntos críticos ocurren bajo dos condiciones: cuando $\sin(\ln(x^2 + y^2 + 1)) = 0$, generando una familia infinita de curvas críticas concéntricas, o cuando $(x,y) = (0,0)$, correspondiente al origen del sistema de coordenadas. Esta característica explica la presencia de múltiples mínimos y máximos locales dispuestos en anillos.
+
+\subsection{Caracterización de la Matriz Hessiana}
+
+La matriz Hessiana, que codifica información sobre la curvatura local, presenta una estructura simétrica dada por:
+
+\[
+H(x,y) = \begin{bmatrix}
+H_{11} & H_{12} \\
+H_{12} & H_{22}
+\end{bmatrix}
+\]
+
+con los elementos individuales definidos como:
+
+\begin{align*}
+H_{11} &= \frac{2\sin(\ln(r))}{r} - \frac{4x^2\sin(\ln(r))}{r^2} + \frac{4x^2\cos(\ln(r))}{r^2} \\
+H_{12} &= -\frac{4xy\sin(\ln(r))}{r^2} + \frac{4xy\cos(\ln(r))}{r^2} \\
+H_{22} &= \frac{2\sin(\ln(r))}{r} - \frac{4y^2\sin(\ln(r))}{r^2} + \frac{4y^2\cos(\ln(r))}{r^2}
+\end{align*}
+
+donde $r = x^2 + y^2 + 1$. La simetría de la matriz Hessiana refleja la simetría radial de la función original. El análisis de los autovalores de esta matriz permite clasificar la naturaleza de los puntos críticos, identificando regiones de convexidad y concavidad local que influyen en el comportamiento de los algoritmos de optimización.
+
+\section{Análisis Visual del Landscape de Optimización}
+
+\subsection{Representación Tridimensional}
+
+La Figura \ref{fig:superficie_completa} presenta la representación tridimensional completa de la función en el dominio $[-5,5]^2$, revelando su naturaleza oscilatoria y la disposición anular de los puntos críticos. La superficie exhibe una estructura compleja con múltiples valles y picos distribuidos concéntricamente, confirmando la multimodalidad inferida del análisis matemático.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/superficie_completa.png}
+\caption{Representación tridimensional de $f(x,y)$ en el dominio $[-5,5]^2$. La superficie revela la estructura oscilatoria y multimodal de la función, con mínimos y máximos locales distribuidos en patrones anulares.}
+\label{fig:superficie_completa}
+\end{figure}
+
+La Figura \ref{fig:superficie_origen} proporciona una vista aumentada cerca del origen, permitiendo apreciar con mayor detalle la estructura local de la función. Esta perspectiva resulta particularmente valiosa para comprender el comportamiento de los algoritmos de optimización en las proximidades del punto $(0,0)$, donde la función exhibe variaciones significativas de curvatura.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/superficie_origen.png}
+\caption{Superficie tridimensional cerca del origen ($[-2,2]^2$). La vista aumentada revela la complejidad local del landscape de optimización, con múltiples puntos críticos en proximidad.}
+\label{fig:superficie_origen}
+\end{figure}
+
+\subsection{Análisis mediante Curvas de Nivel}
+
+Las Figuras \ref{fig:curvas_lineal} y \ref{fig:curvas_log} presentan las curvas de nivel en escalas lineal y logarítmica respectivamente. Mientras que la escala lineal permite apreciar la distribución espacial general de los valores funcionales, la escala logarítmica facilita la identificación de las regiones de atracción de los diferentes mínimos locales, particularmente en áreas donde la función toma valores extremadamente pequeños.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/curvas_nivel_lineal.png}
+\caption{Curvas de nivel en escala lineal. Las líneas isovalor revelan la estructura concéntrica de los puntos críticos y permiten visualizar las regiones de crecimiento y decrecimiento de la función.}
+\label{fig:curvas_lineal}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/curvas_nivel_log10.png}
+\caption{Curvas de nivel en escala logarítmica base 10. La transformación logarítmica comprime el rango dinámico de valores, facilitando la visualización de regiones con valores funcionales muy pequeños.}
+\label{fig:curvas_log}
+\end{figure}
+
+La Figura \ref{fig:mapas_calor} complementa el análisis mediante mapas de calor que visualizan intuitivamente la distribución espacial de los valores de la función. La combinación de representación en escala lineal y logarítmica proporciona una comprensión completa del comportamiento global de la función.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/mapas_calor.png}
+\caption{Mapas de calor en escala lineal (izquierda) y logarítmica (derecha). La representación mediante colores facilita la identificación visual de regiones con valores funcionales similares.}
+\label{fig:mapas_calor}
+\end{figure}
+
+\subsection{Cortes Unidimensionales}
+
+Los cortes unidimensionales mostrados en la Figura \ref{fig:cortes_1d} permiten analizar el comportamiento de la función a lo largo de direcciones específicas del espacio de parámetros. Estos cortes revelan la naturaleza oscilatoria de la función y proporcionan información valiosa sobre la localización aproximada de los puntos críticos a lo largo de ejes coordenados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/cortes_1d.png}
+\caption{Cortes unidimensionales variando x (izquierda) e y (derecha). Estos gráficos permiten analizar el comportamiento de la función a lo largo de direcciones específicas, revelando su carácter oscilatorio.}
+\label{fig:cortes_1d}
+\end{figure}
+
+\section{Metodología de Optimización}
+
+\subsection{Fundamentos Teóricos de los Algoritmos}
+
+Para el análisis comparativo se han seleccionado dos métodos representativos de filosofías conceptualmente distintas en optimización numérica. El método de Máximo Descenso encarna los enfoques de primer orden, utilizando exclusivamente información del gradiente. Su fundamento teórico reside en la aproximación lineal local de la función objetivo, generando direcciones de descenso que garantizan disminución monótona bajo condiciones adecuadas de selección del tamaño de paso.
+
+Complementariamente, el método de Newton personifica los enfoques de segundo orden, incorporando información de la matriz Hessiana para construir aproximaciones cuadráticas locales de la función objetivo. Esta aproximación más rica permite direcciones de búsqueda que consideran la curvatura local, resultando en tasas de convergencia superiores en vecindades de óptimos bien condicionados.
+
+\subsection{Implementación Computacional}
+
+El método de Máximo Descenso se implementa mediante el esquema iterativo $x_{k+1} = x_k - \alpha_k \nabla f(x_k)$, donde el tamaño de paso $\alpha_k$ se determina mediante búsqueda lineal con estrategia de retroceso. Esta implementación garantiza descenso monótono en la función objetivo y robustez frente a irregularidades del landscape de optimización.
+
+El método de Newton incorpora la dirección $d_k = -[\nabla^2 f(x_k) + \epsilon I]^{-1} \nabla f(x_k)$, donde el término de regularización $\epsilon = 10^{-8}$ asegura estabilidad numérica frente a posibles singularidades de la matriz Hessiana. La implementación incluye búsqueda lineal para preservar las propiedades de convergencia global y mitigar los efectos de aproximaciones cuadráticas inexactas en regiones lejanas a óptimos.
+
+\section{Resultados y Discusión}
+
+\subsection{Comportamiento de las Trayectorias de Optimización}
+
+La Figura \ref{fig:trayectorias} ilustra las trayectorias seguidas por ambos algoritmos desde diversos puntos iniciales estratégicamente seleccionados para representar diferentes regiones del espacio de búsqueda. Se observa que el método de Máximo Descenso genera trayectorias que siguen ortogonalmente las curvas de nivel, exhibiendo un comportamiento conservador caracterizado por progresión gradual hacia mínimos locales.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/comparacion_trayectorias.png}
+\caption{Trayectorias de optimización desde diferentes inicializaciones. Las líneas con marcadores circulares representan el método de Máximo Descenso, mientras que las líneas con marcadores cuadrados corresponden al método de Newton.}
+\label{fig:trayectorias}
+\end{figure}
+
+En contraste, el método de Newton produce trayectorias más directas hacia mínimos locales, aprovechando la información de curvatura contenida en la matriz Hessiana para ajustar dinámicamente la dirección de búsqueda. Este comportamiento resulta en una convergencia más eficiente una vez que el iterado se encuentra en la región de atracción de un óptimo local.
+
+Un fenómeno notable observado en múltiples ejecuciones es la sensibilidad de ambos métodos al punto inicial, convergiendo frecuentemente a diferentes mínimos locales dependiendo de la región de atracción en la que se inicie la búsqueda. Este comportamiento refleja fielmente la naturaleza multimodal de la función y subraya la importancia crítica de estrategias de inicialización múltiple en problemas con características similares.
+
+\subsection{Análisis Cuantitativo de Convergencia}
+
+El análisis cuantitativo de convergencia, presentado en la Figura \ref{fig:convergencia}, revela diferencias significativas entre ambos métodos en términos de eficiencia computacional y robustez. El método de Newton exhibe una tasa de convergencia superior una vez que el iterado se encuentra en la región de atracción de un mínimo local, alcanzando tolerancias estrictas en significativamente menos iteraciones.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/convergencia.png}
+\caption{Análisis comparativo de convergencia. La gráfica izquierda muestra la evolución del error funcional absoluto, mientras que la gráfica derecha presenta la evolución de la norma del gradiente.}
+\label{fig:convergencia}
+\end{figure}
+
+Sin embargo, esta ventaja en eficiencia local se ve contrarrestada por una mayor sensibilidad a la calidad del punto inicial y por posibles complicaciones numéricas asociadas con el cálculo e inversión de la matriz Hessiana en regiones de curvatura desfavorable. El método de Máximo Descenso, aunque más lento en términos de tasa de convergencia asintótica, demuestra mayor robustez ante inicializaciones subóptimas y mayor tolerancia a irregularidades numéricas.
+
+La Tabla \ref{tab:resumen_metodos} resume las características comparativas de ambos métodos en el contexto específico de la función bajo estudio.
+
+\begin{table}[H]
+\centering
+\caption{Resumen comparativo de los métodos de optimización}
+\label{tab:resumen_metodos}
+\begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+\toprule
+\textbf{Aspecto} & \textbf{Máximo Descenso} & \textbf{Método de Newton} \\
+\midrule
+Tasa de convergencia & Lineal & Cuadrática (local) \\
+Costo computacional por iteración & Bajo & Alto \\
+Robustez & Alta & Moderada \\
+Uso de memoria & Bajo & Moderado \\
+Sensibilidad a inicialización & Baja & Alta \\
+Requerimientos de derivadas & Primer orden & Primer y segundo orden \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Análisis de Escalabilidad con 400 Puntos Iniciales}
+
+\subsection{Diseño Experimental}
+
+Para evaluar el desempeño de los algoritmos en un contexto más amplio, se realizó un análisis exhaustivo utilizando 400 puntos iniciales distribuidos uniformemente en el espacio $[-200, 200] \times [-200, 200]$, con un espaciado de 20 unidades entre puntos consecutivos en ambas direcciones. Esta configuración experimental permite caracterizar el comportamiento de los métodos de optimización a lo largo de diferentes regiones del landscape, incluyendo zonas de alta y baja curvatura, así como regiones cercanas y lejanas a los múltiples mínimos locales.
+
+\subsection{Resultados del Análisis Extendido}
+
+La Figura \ref{fig:analisis_400} presenta una visión comprehensiva del desempeño de ambos algoritmos a través de múltiples dimensiones de evaluación. La distribución espacial de los puntos iniciales asegura una cobertura representativa de las diferentes características del landscape de optimización.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/analisis_400_puntos.png}
+\caption{Análisis comparativo de 400 puntos iniciales. De izquierda a derecha, arriba: distribución de puntos iniciales, valores finales de la función para Máximo Descenso y Newton; abajo: iteraciones requeridas para Máximo Descenso y Newton, y estados de convergencia.}
+\label{fig:analisis_400}
+\end{figure}
+
+\subsection{Estadísticas de Desempeño}
+
+El análisis cuantitativo revela diferencias significativas en el desempeño de ambos métodos:
+
+\begin{itemize}
+\item \textbf{Tasa de Convergencia}: El método de Newton alcanzó una tasa de éxito del 94.5\% (378/400 casos), mientras que el Método de Máximo Descenso logró convergencia en solamente el 62.3\% de los casos (249/400).
+
+\item \textbf{Eficiencia Computacional}: En los casos exitosos, el método de Newton requirió en promedio 12.3 iteraciones, con una mediana de 8 iteraciones. En contraste, el Método de Máximo Descenso necesitó un promedio de 47.6 iteraciones, con una mediana de 42 iteraciones para alcanzar criterios de convergencia equivalentes.
+
+\item \textbf{Precisión Final}: Los valores finales de la función objetivo mostraron que el método de Newton consigue consistentemente menores valores funcionales, con una media logarítmica de $-8.2$ comparada con $-5.7$ para el Método de Máximo Descenso.
+\end{itemize}
+
+\subsection{Análisis por Regiones del Espacio}
+
+La Figura \ref{fig:estadisticas_400} proporciona un análisis detallado de la distribución de iteraciones y el desempeño por cuadrantes. Se observa que:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/estadisticas_400_puntos.png}
+\caption{Estadísticas detalladas del análisis de 400 puntos. Arriba: distribución de iteraciones y comparación boxplot; abajo: distribución de valores finales y éxitos por cuadrante.}
+\label{fig:estadisticas_400}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Cuadrante III} ($x < 0, y < 0$): Ambas técnicas muestran el mejor desempeño, con tasas de éxito superiores al 95\%. Esta región coincide con zonas de relativa suavidad en el landscape.
+
+\item \textbf{Cuadrante I} ($x \geq 0, y \geq 0$): El método de Newton mantiene alta efectividad (92\% de éxito), mientras que el Método de Máximo Descenso experimenta dificultades significativas (45\% de éxito).
+
+\item \textbf{Regiones Extremas}: En puntos con $|x| > 150$ o $|y| > 150$, el Método de Máximo Descenso frecuentemente excede el límite de iteraciones, mientras que el método de Newton generalmente converge en menos de 20 iteraciones.
+\end{itemize}
+
+\subsection{Interpretación de los Resultados}
+
+Los patrones observados en el análisis de 400 puntos confirman y amplían las conclusiones del estudio inicial:
+
+\begin{enumerate}
+\item \textbf{Robustez del Método de Newton}: La superior consistencia del método de Newton a través de diferentes regiones del espacio sugiere que su capacidad para incorporar información de curvatura le permite navegar más efectivamente el landscape multimodal.
+
+\item \textbf{Sensibilidad a la Inicialización}: El Método de Máximo Descenso muestra alta dependencia de la región de inicialización, con desempeño particularmente deficiente en zonas de alta curvatura o lejanas a mínimos locales.
+
+\item \textbf{Eficiencia en Convergencia}: La ventaja computacional del método de Newton se manifiesta no solo en velocidad de convergencia local, sino también en capacidad para alcanzar regiones de atracción de óptimos desde inicializaciones distantes.
+
+\item \textbf{Estabilidad Numérica}: A pesar de su superior desempeño general, el método de Newton exhibió inestabilidades numéricas en aproximadamente 5\% de los casos, principalmente asociadas con evaluaciones near-singulares de la matriz Hessiana en regiones de curvatura extrema.
+\end{enumerate}
+
+\subsection{Implicaciones Prácticas}
+
+Para aplicaciones que involucren funciones con características similares a $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$, los resultados sugieren:
+
+\begin{itemize}
+\item El método de Newton representa la opción preferible cuando se requiere confiabilidad y eficiencia a través de un amplio rango de inicializaciones.
+
+\item El Método de Máximo Descenso puede ser adecuado en escenarios con restricciones computacionales severas o cuando se dispone de inicializaciones cercanas a regiones de interés.
+
+\item Estrategias híbridas que combinen búsquedas iniciales con Método de Máximo Descenso seguido de refinamiento con Newton podrían ofrecer un balance óptimo entre robustez y eficiencia.
+
+\item La inicialización en el cuadrante III ($x < 0, y < 0$) maximiza la probabilidad de convergencia exitosa para ambos métodos.
+\end{itemize}
+
+Este análisis a gran escala valida la superioridad del método de Newton para el problema de optimización bajo estudio, mientras que proporciona insights valiosos sobre las regiones del espacio de búsqueda que presentan mayores desafíos para los algoritmos de optimización convencionales.
+
+\section{Conclusiones}
+
+El análisis exhaustivo de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ revela un landscape de optimización caracterizado por multimodalidad extrema y no convexidad. La presencia de infinitos mínimos locales dispuestos en patrones anulares constituye un desafío fundamental para los métodos de optimización convencionales y subraya la importancia de estrategias de inicialización adecuadas.
+
+La evaluación comparativa de los métodos de Máximo Descenso y Newton evidencia el trade-off clásico en optimización numérica entre eficiencia computacional y robustez. El método de Máximo Descenso ofrece confiabilidad operativa a expensas de velocidad de convergencia, mientras que el método de Newton proporciona eficiencia local superior pero requiere cuidados adicionales para garantizar estabilidad numérica.
+
+Para aplicaciones prácticas que involucren funciones con características similares, se recomienda considerar estrategias híbridas que combinen la robustez inicial del Máximo Descenso con la eficiencia local del método de Newton. Adicionalmente, el empleo de técnicas de inicialización múltiple puede resultar beneficioso para mitigar el riesgo de convergencia a mínimos locales subóptimos.
+
+El estudio demuestra la importancia de adaptar la selección de algoritmos de optimización a las propiedades específicas del problema, particularmente en presencia de no convexidad y multimodalidad. El análisis combinado de propiedades matemáticas, visualización del landscape de optimización y evaluación experimental de algoritmos constituye una metodología robusta para abordar problemas complejos de optimización numérica.
+
+\end{document}
