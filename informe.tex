@@ -87,7 +87,7 @@ Modelos de Optimización}
 
 Este informe presenta un análisis exhaustivo de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$, caracterizada por su naturaleza multimodal y comportamiento oscilatorio. El estudio abarca el análisis matemático completo, incluyendo el cálculo del gradiente y la matriz Hessiana, seguido de una exploración visual detallada del landscape de optimización. 
 
-Se implementan y comparan dos métodos de optimización representativos: el método de Máximo Descenso, que utiliza información de primer orden, y el método de Newton, que incorpora información de segundo orden a través de la matriz Hessiana. Los resultados demuestran las ventajas comparativas de cada método en diferentes contextos de inicialización y resaltan los desafíos particulares que presenta la multimodalidad de la función.
+Se implementan y comparan dos métodos de optimización representativos: el método de Máximo Descenso, que utiliza información de primer orden, y el método de Newton, que incorpora información de segundo orden a través de la matriz Hessiana. El análisis a gran escala con 400 puntos iniciales revela diferencias significativas en el desempeño de ambos métodos, con el método de Newton mostrando superioridad tanto en tasa de convergencia como en eficiencia computacional.
 
 \newpage
 
@@ -284,14 +284,14 @@ La Figura \ref{fig:analisis_400} presenta una visión comprehensiva del desempe�
 
 \subsection{Estadísticas de Desempeño}
 
-El análisis cuantitativo revela diferencias significativas en el desempeño de ambos métodos:
+El análisis cuantitativo revela diferencias dramáticas en el desempeño de ambos métodos:
 
 \begin{itemize}
-\item \textbf{Tasa de Convergencia}: El método de Newton alcanzó una tasa de éxito del 94.5\% (378/400 casos), mientras que el Método de Máximo Descenso logró convergencia en solamente el 62.3\% de los casos (249/400).
+\item \textbf{Tasa de Convergencia}: El método de Newton alcanzó una tasa de éxito del 61.8\% (247/400 casos), mientras que el Método de Máximo Descenso logró convergencia en solamente el 2.2\% de los casos (9/400).
 
-\item \textbf{Eficiencia Computacional}: En los casos exitosos, el método de Newton requirió en promedio 12.3 iteraciones, con una mediana de 8 iteraciones. En contraste, el Método de Máximo Descenso necesitó un promedio de 47.6 iteraciones, con una mediana de 42 iteraciones para alcanzar criterios de convergencia equivalentes.
+\item \textbf{Eficiencia Computacional}: En los casos exitosos, el método de Newton requirió en promedio 4.3 iteraciones, con una mediana de 4 iteraciones. En contraste, el Método de Máximo Descenso necesitó un promedio de 444.4 iteraciones, con una mediana de 500 iteraciones, alcanzando frecuentemente el límite máximo de iteraciones.
 
-\item \textbf{Precisión Final}: Los valores finales de la función objetivo mostraron que el método de Newton consigue consistentemente menores valores funcionales, con una media logarítmica de $-8.2$ comparada con $-5.7$ para el Método de Máximo Descenso.
+\item \textbf{Precisión Final}: Los valores finales de la función objetivo mostraron que el método de Newton consigue consistentemente menores valores funcionales, con una media de $-0.31$ comparada con $0.42$ para el Método de Máximo Descenso, indicando que Newton encuentra mínimos más profundos.
 \end{itemize}
 
 \subsection{Análisis por Regiones del Espacio}
@@ -306,25 +306,25 @@ La Figura \ref{fig:estadisticas_400} proporciona un análisis detallado de la di
 \end{figure}
 
 \begin{itemize}
-\item \textbf{Cuadrante III} ($x < 0, y < 0$): Ambas técnicas muestran el mejor desempeño, con tasas de éxito superiores al 95\%. Esta región coincide con zonas de relativa suavidad en el landscape.
+\item \textbf{Patrón de Convergencia}: El método de Newton muestra un patrón de convergencia consistente a través de todos los cuadrantes, mientras que el Método de Máximo Descenso solo converge exitosamente desde puntos iniciales muy específicos.
 
-\item \textbf{Cuadrante I} ($x \geq 0, y \geq 0$): El método de Newton mantiene alta efectividad (92\% de éxito), mientras que el Método de Máximo Descenso experimenta dificultades significativas (45\% de éxito).
+\item \textbf{Iteraciones Requeridas}: La distribución de iteraciones revela que el método de Newton converge rápidamente (generalmente en menos de 12 iteraciones), mientras que el Método de Máximo Descenso frecuentemente alcanza el límite máximo de 500 iteraciones sin converger.
 
-\item \textbf{Regiones Extremas}: En puntos con $|x| > 150$ o $|y| > 150$, el Método de Máximo Descenso frecuentemente excede el límite de iteraciones, mientras que el método de Newton generalmente converge en menos de 20 iteraciones.
+\item \textbf{Valores Finales}: Los valores finales obtenidos por Newton se concentran alrededor de $-0.31$, indicando convergencia a mínimos locales consistentes, mientras que los valores del Método de Máximo Descenso se distribuyen ampliamente entre $-1.00$ y $1.00$.
 \end{itemize}
 
 \subsection{Interpretación de los Resultados}
 
-Los patrones observados en el análisis de 400 puntos confirman y amplían las conclusiones del estudio inicial:
+Los patrones observados en el análisis de 400 puntos revelan limitaciones fundamentales en el Método de Máximo Descenso para esta función específica:
 
 \begin{enumerate}
-\item \textbf{Robustez del Método de Newton}: La superior consistencia del método de Newton a través de diferentes regiones del espacio sugiere que su capacidad para incorporar información de curvatura le permite navegar más efectivamente el landscape multimodal.
+\item \textbf{Inefectividad del Máximo Descenso}: La extremadamente baja tasa de éxito del 2.2\% sugiere que el Método de Máximo Descenso struggle significativamente con la naturaleza multimodal y oscilatoria de la función, frecuentemente quedando atrapado en regiones de pendiente casi nula que no corresponden a mínimos locales.
 
-\item \textbf{Sensibilidad a la Inicialización}: El Método de Máximo Descenso muestra alta dependencia de la región de inicialización, con desempeño particularmente deficiente en zonas de alta curvatura o lejanas a mínimos locales.
+\item \textbf{Eficiencia Superior de Newton}: La capacidad del método de Newton para converger en el 61.8\% de los casos con un promedio de solo 4.3 iteraciones demuestra su efectividad para navegar el landscape complejo y localizar mínimos locales eficientemente.
 
-\item \textbf{Eficiencia en Convergencia}: La ventaja computacional del método de Newton se manifiesta no solo en velocidad de convergencia local, sino también en capacidad para alcanzar regiones de atracción de óptimos desde inicializaciones distantes.
+\item \textbf{Sensibilidad a Condiciones Iniciales}: La diferencia en tasas de éxito resalta la importancia crítica de la inicialización. Mientras que Newton puede recuperarse de inicializaciones subóptimas, el Método de Máximo Descenso requiere inicializaciones muy específicas para tener éxito.
 
-\item \textbf{Estabilidad Numérica}: A pesar de su superior desempeño general, el método de Newton exhibió inestabilidades numéricas en aproximadamente 5\% de los casos, principalmente asociadas con evaluaciones near-singulares de la matriz Hessiana en regiones de curvatura extrema.
+\item \textbf{Comportamiento Oscilatorio}: La alta mediana de iteraciones para el Método de Máximo Descenso (500) sugiere que frecuentemente oscila entre regiones sin lograr converger, mientras que Newton muestra un comportamiento de convergencia más estable y directo.
 \end{enumerate}
 
 \subsection{Implicaciones Prácticas}
@@ -332,25 +332,25 @@ Los patrones observados en el análisis de 400 puntos confirman y amplían las c
 Para aplicaciones que involucren funciones con características similares a $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$, los resultados sugieren:
 
 \begin{itemize}
-\item El método de Newton representa la opción preferible cuando se requiere confiabilidad y eficiencia a través de un amplio rango de inicializaciones.
+\item El método de Newton representa la única opción viable cuando se requiere confiabilidad y eficiencia a través de un amplio rango de inicializaciones.
 
-\item El Método de Máximo Descenso puede ser adecuado en escenarios con restricciones computacionales severas o cuando se dispone de inicializaciones cercanas a regiones de interés.
+\item El Método de Máximo Descenso debe evitarse para funciones con multimodalidad extrema y comportamiento oscilatorio, ya que demuestra ser inefectivo en la mayoría de los casos.
 
-\item Estrategias híbridas que combinen búsquedas iniciales con Método de Máximo Descenso seguido de refinamiento con Newton podrían ofrecer un balance óptimo entre robustez y eficiencia.
+\item Estrategias de inicialización múltiple son esenciales, pero incluso con estas estrategias, el Método de Máximo Descenso muestra limitaciones fundamentales.
 
-\item La inicialización en el cuadrante III ($x < 0, y < 0$) maximiza la probabilidad de convergencia exitosa para ambos métodos.
+\item La superioridad del método de Newton en este contexto específico justifica el costo computacional adicional asociado con el cálculo de la matriz Hessiana.
 \end{itemize}
 
-Este análisis a gran escala valida la superioridad del método de Newton para el problema de optimización bajo estudio, mientras que proporciona insights valiosos sobre las regiones del espacio de búsqueda que presentan mayores desafíos para los algoritmos de optimización convencionales.
+Este análisis a gran escala valida la superioridad abrumadora del método de Newton para el problema de optimización bajo estudio, mientras que revela limitaciones fundamentales del Método de Máximo Descenso en presencia de multimodalidad extrema.
 
 \section{Conclusiones}
 
-El análisis exhaustivo de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ revela un landscape de optimización caracterizado por multimodalidad extrema y no convexidad. La presencia de infinitos mínimos locales dispuestos en patrones anulares constituye un desafío fundamental para los métodos de optimización convencionales y subraya la importancia de estrategias de inicialización adecuadas.
+El análisis exhaustivo de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ revela un landscape de optimización caracterizado por multimodalidad extrema y no convexidad. La presencia de infinitos mínimos locales dispuestos en patrones anulares constituye un desafío fundamental para los métodos de optimización convencionales.
 
-La evaluación comparativa de los métodos de Máximo Descenso y Newton evidencia el trade-off clásico en optimización numérica entre eficiencia computacional y robustez. El método de Máximo Descenso ofrece confiabilidad operativa a expensas de velocidad de convergencia, mientras que el método de Newton proporciona eficiencia local superior pero requiere cuidados adicionales para garantizar estabilidad numérica.
+La evaluación comparativa a gran escala con 400 puntos iniciales demuestra diferencias dramáticas en el desempeño de los métodos estudiados. El método de Newton alcanza una tasa de éxito del 61.8\% con un promedio de solo 4.3 iteraciones por caso exitoso, mientras que el Método de Máximo Descenso logra convergencia en solamente el 2.2\% de los casos, requiriendo un promedio de 444.4 iteraciones y frecuentemente alcanzando el límite máximo sin converger.
 
-Para aplicaciones prácticas que involucren funciones con características similares, se recomienda considerar estrategias híbridas que combinen la robustez inicial del Máximo Descenso con la eficiencia local del método de Newton. Adicionalmente, el empleo de técnicas de inicialización múltiple puede resultar beneficioso para mitigar el riesgo de convergencia a mínimos locales subóptimos.
+Estos resultados sugieren que para funciones con características de multimodalidad extrema y comportamiento oscilatorio, el método de Newton representa la opción preferible debido a su capacidad para incorporar información de curvatura y navegar eficientemente el landscape complejo. El Método de Máximo Descenso, aunque conceptualmente simple y computacionalmente menos costoso por iteración, demuestra ser inefectivo para este tipo de problemas.
 
-El estudio demuestra la importancia de adaptar la selección de algoritmos de optimización a las propiedades específicas del problema, particularmente en presencia de no convexidad y multimodalidad. El análisis combinado de propiedades matemáticas, visualización del landscape de optimización y evaluación experimental de algoritmos constituye una metodología robusta para abordar problemas complejos de optimización numérica.
+El estudio subraya la importancia de seleccionar algoritmos de optimización apropiados para las características específicas del problema y resalta el valor del análisis experimental a gran escala para evaluar el desempeño real de los métodos en contextos prácticos.
 
 \end{document}
