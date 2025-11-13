@@ -120,6 +120,32 @@ El gradiente de la función, que determina las direcciones de máximo crecimient
 
 La estructura del gradiente revela que los puntos críticos ocurren bajo dos condiciones: cuando $\sin(\ln(x^2 + y^2 + 1)) = 0$, generando una familia infinita de curvas críticas concéntricas, o cuando $(x,y) = (0,0)$, correspondiente al origen del sistema de coordenadas. Esta característica explica la presencia de múltiples mínimos y máximos locales dispuestos en anillos.
 
+\subsection{Identificación de Mínimos Locales}
+
+Los mínimos locales de la función $f(x,y) = -\cos(\ln(x^2 + y^2 + 1))$ ocurren cuando $\sin(\ln(x^2 + y^2 + 1)) = 0$ y la matriz Hessiana es definida positiva. Esto sucede cuando $\ln(x^2 + y^2 + 1) = 2k\pi$ para $k$ entero, es decir, cuando $x^2 + y^2 + 1 = e^{2k\pi}$. Por lo tanto, los mínimos locales se encuentran en círculos de radio $r_k = \sqrt{e^{2k\pi} - 1}$.
+
+Despejando matemáticamente: $x^2 + y^2 = e^{2k\pi} - 1$. Para $k=1$ en el rango $[0,100]$ hay un anillo de mínimos locales a aproximadamente 23.12 unidades del origen.
+
+En la Tabla \ref{tab:minimos} se muestran los primeros mínimos locales con ejemplos de coordenadas específicas:
+
+\begin{table}[H]
+\centering
+\caption{Radios y coordenadas de mínimos locales}
+\label{tab:minimos}
+\begin{tabular}{cccc}
+\toprule
+$k$ & $r_k = \sqrt{e^{2k\pi} - 1}$ & Aproximación & Coordenadas ejemplo \\
+\midrule
+0 & $\sqrt{e^{0} - 1} = 0$ & 0.0000 & $(0, 0)$ \\
+1 & $\sqrt{e^{2\pi} - 1}$ & 23.1200 & $(23.12, 0)$, $(0, 23.12)$ \\
+2 & $\sqrt{e^{4\pi} - 1}$ & 535.4917 & $(535.49, 0)$, $(0, 535.49)$ \\
+3 & $\sqrt{e^{6\pi} - 1}$ & 12391.5758 & $(12391.58, 0)$, $(0, 12391.58)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nótese que para $k=0$ se obtiene el origen, que en este caso es un mínimo local. Para $k=1$ el radio es aproximadamente 23.12, lo que significa que en el rango $[0,100]$ hay un anillo de mínimos locales a una distancia de 23.12 unidades del origen.
+
 \subsection{Caracterización de la Matriz Hessiana}
 
 La matriz Hessiana, que codifica información sobre la curvatura local, presenta una estructura simétrica dada por:
@@ -211,9 +237,25 @@ Complementariamente, el método de Newton personifica los enfoques de segundo or
 
 \subsection{Implementación Computacional}
 
-El método de Máximo Descenso se implementa mediante el esquema iterativo $x_{k+1} = x_k - \alpha_k \nabla f(x_k)$, donde el tamaño de paso $\alpha_k$ se determina mediante búsqueda lineal con estrategia de retroceso. Esta implementación garantiza descenso monótono en la función objetivo y robustez frente a irregularidades del landscape de optimización.
+\subsubsection{Método de Máximo Descenso}
+El método de Máximo Descenso se implementa mediante el esquema iterativo $x_{k+1} = x_k - \alpha_k \nabla f(x_k)$, donde el tamaño de paso $\alpha_k$ se determina mediante búsqueda lineal con estrategia de retroceso (backtracking). 
 
-El método de Newton incorpora la dirección $d_k = -[\nabla^2 f(x_k) + \epsilon I]^{-1} \nabla f(x_k)$, donde el término de regularización $\epsilon = 10^{-8}$ asegura estabilidad numérica frente a posibles singularidades de la matriz Hessiana. La implementación incluye búsqueda lineal para preservar las propiedades de convergencia global y mitigar los efectos de aproximaciones cuadráticas inexactas en regiones lejanas a óptimos.
+La búsqueda lineal utiliza una \textbf{condición de Armijo modificada}:
+\[
+f(x_k - \alpha_k \nabla f(x_k)) \leq f(x_k) - c \alpha_k \|\nabla f(x_k)\|^2
+\]
+con $c = 10^{-4}$. El algoritmo comienza con un tamaño de paso inicial $\alpha_k = \min(1.0, 1.0/(\|\nabla f(x_k)\| + 10^{-8}))$ y lo reduce multiplicando por un factor $\beta = 0.7$ en cada iteración de la búsqueda lineal hasta que se cumple la condición de Armijo.
+
+Los \textbf{criterios de parada} son: norma del gradiente menor a $\text{tol} = 10^{-6}$ o número máximo de iteraciones alcanzado (500 para el análisis extensivo, 1000 para trayectorias individuales).
+
+\subsubsection{Método de Newton}
+El método de Newton incorpora la dirección $d_k = -[\nabla^2 f(x_k) + \epsilon I]^{-1} \nabla f(x_k)$, donde el término de \textbf{regularización} $\epsilon = 10^{-8}$ asegura estabilidad numérica frente a posibles singularidades de la matriz Hessiana. 
+
+El \textbf{manejo de casos singulares} se implementa mediante un bloque try-except: si la inversión de la matriz Hessiana regularizada falla, se utiliza la dirección de máximo descenso como fallback.
+
+La implementación incluye búsqueda lineal con backtracking (mismos parámetros que Máximo Descenso) para preservar las propiedades de convergencia global. Los \textbf{criterios de parada} son: norma del gradiente menor a $\text{tol} = 10^{-8}$ o máximo de 100 iteraciones.
+
+La principal \textbf{ventaja de convergencia cuadrática} del método de Newton se manifiesta cuando el iterado está suficientemente cerca de un mínimo local y la Hessiana es definida positiva, permitiendo alcanzar alta precisión en muy pocas iteraciones.
 
 \section{Resultados y Discusión}
 
@@ -273,13 +315,48 @@ Para evaluar el desempeño de los algoritmos en un contexto más amplio, se real
 
 \subsection{Resultados del Análisis Extendido}
 
-La Figura \ref{fig:analisis_400} presenta una visión comprehensiva del desempeño de ambos algoritmos a través de múltiples dimensiones de evaluación. La distribución espacial de los puntos iniciales asegura una cobertura representativa de las diferentes características del landscape de optimización.
+El análisis con 400 puntos iniciales revela diferentes aspectos del desempeño de los algoritmos. Las Figuras \ref{fig:400_puntos_iniciales} a \ref{fig:400_convergencia_cuadrantes} presentan una visión detallada de los resultados.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/analisis_400_puntos.png}
-\caption{Análisis comparativo de 400 puntos iniciales. De izquierda a derecha, arriba: distribución de puntos iniciales, valores finales de la función para Máximo Descenso y Newton; abajo: iteraciones requeridas para Máximo Descenso y Newton, y estados de convergencia.}
-\label{fig:analisis_400}
+\includegraphics[width=0.85\textwidth]{figures/400_puntos_iniciales.png}
+\caption{Distribución uniforme de 400 puntos iniciales en el espacio $[-200,200]^2$}
+\label{fig:400_puntos_iniciales}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/400_valores_finales_md.png}
+\caption{Valores finales de $f(x,y)$ obtenidos por Máximo Descenso desde cada punto inicial}
+\label{fig:400_valores_finales_md}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/400_valores_finales_newton.png}
+\caption{Valores finales de $f(x,y)$ obtenidos por Newton desde cada punto inicial}
+\label{fig:400_valores_finales_newton}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/400_iteraciones_md.png}
+\caption{Iteraciones requeridas para convergencia del método de Máximo Descenso}
+\label{fig:400_iteraciones_md}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/400_iteraciones_newton.png}
+\caption{Iteraciones requeridas para convergencia del método de Newton}
+\label{fig:400_iteraciones_newton}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/400_convergencia_cuadrantes.png}
+\caption{Análisis de convergencia por cuadrante (éxitos de Newton en círculo negro)}
+\label{fig:400_convergencia_cuadrantes}
 \end{figure}
 
 \subsection{Estadísticas de Desempeño}
@@ -296,12 +373,12 @@ El análisis cuantitativo revela diferencias dramáticas en el desempeño de amb
 
 \subsection{Análisis por Regiones del Espacio}
 
-La Figura \ref{fig:estadisticas_400} proporciona un análisis detallado de la distribución de iteraciones y el desempeño por cuadrantes. Se observa que:
+La Figura \ref{fig:estadisticas_400} proporciona un análisis detallado de la distribución de iteraciones y el desempeño por cuadrantes, implementando escala logarítmica en los histogramas de iteraciones para mejor visualización.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/estadisticas_400_puntos.png}
-\caption{Estadísticas detalladas del análisis de 400 puntos. Arriba: distribución de iteraciones y comparación boxplot; abajo: distribución de valores finales y éxitos por cuadrante.}
+\includegraphics[width=0.95\textwidth]{figures/estadisticas_400_puntos.png}
+\caption{Estadísticas detalladas del análisis de 400 puntos. Arriba: distribución de iteraciones (escala logarítmica) y comparación boxplot; abajo: distribución de valores finales y éxitos por cuadrante.}
 \label{fig:estadisticas_400}
 \end{figure}
 
@@ -318,7 +395,7 @@ La Figura \ref{fig:estadisticas_400} proporciona un análisis detallado de la di
 Los patrones observados en el análisis de 400 puntos revelan limitaciones fundamentales en el Método de Máximo Descenso para esta función específica:
 
 \begin{enumerate}
-\item \textbf{Inefectividad del Máximo Descenso}: La extremadamente baja tasa de éxito del 2.2\% sugiere que el Método de Máximo Descenso struggle significativamente con la naturaleza multimodal y oscilatoria de la función, frecuentemente quedando atrapado en regiones de pendiente casi nula que no corresponden a mínimos locales.
+\item \textbf{Inefectividad del Máximo Descenso}: La extremadamente baja tasa de éxito del 2.2\% sugiere que el Método de Máximo Descenso tiene dificultades significativas con la naturaleza multimodal y oscilatoria de la función, frecuentemente quedando atrapado en regiones de pendiente casi nula que no corresponden a mínimos locales.
 
 \item \textbf{Eficiencia Superior de Newton}: La capacidad del método de Newton para converger en el 61.8\% de los casos con un promedio de solo 4.3 iteraciones demuestra su efectividad para navegar el landscape complejo y localizar mínimos locales eficientemente.
 
